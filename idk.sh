@@ -46,7 +46,7 @@ function interpreter () {
 			execute)
 				if [[ $instruction -eq 1 ]]; then
 					exit 0
-				elif [[ $instruction == 2 ]]; then
+				elif [[ $instruction -eq 2 ]]; then
 				 	echo "$output"
 				fi
 				;;
