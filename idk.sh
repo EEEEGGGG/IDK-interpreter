@@ -50,6 +50,15 @@ function interpreter () {
 				 	echo "$variable"
 				fi
 				;;
+			isolate)
+				echo "I still don't understand, what is this?"
+				;;
+			isolateX)
+				echo "What is this?"
+				;;
+			pause)
+				sleep 1
+				;;
 		esac
 	done
 	
