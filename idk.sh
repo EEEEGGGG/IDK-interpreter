@@ -25,7 +25,6 @@ function interpreter () {
 	fi
 
 	for (( len = 0, len1 = 1; len < ${#TOKENS[@]}; len++, len1++ )); do
-##		case $TOKEN in
 		case ${TOKENS[$len]} in
 			movLoc)
 				if [[ ${TOKENS[$len1]} -eq 1 ]]; then
