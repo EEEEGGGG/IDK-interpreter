@@ -23,32 +23,33 @@ function interpreter () {
 	if [[ ${TOKENS[0]} != openC ]]; then
 		exit 1
 	fi
-	
-	for ((len = 0, len1 = 1, TOKEN = ${TOKENS[$len]}; len < ${#TOKENS}; len++, len1++ )); do
-		case $TOKEN in
+
+	for (( len = 0, len1 = 1; len < ${#TOKENS[@]}; len++, len1++ )); do
+##		case $TOKEN in
+		case ${TOKENS[$len]} in
 			movLoc)
-				if [[ $len1 -eq 1 ]]; then
+				if [[ ${TOKENS[$len1]} -eq 1 ]]; then
 					inst=1
-				elif [[ $len1 -eq 2 ]]; then
+				elif [[ ${TOKENS[$len1]} -eq 2 ]]; then
 					inst=2
 				fi
-			;;
+				;;
 			extract)
 				if [[ $inst -eq 1 ]]; then
 			         	instruction="stop"
 				elif [[ $inst -eq 2 ]]; then
 					instruction="output"
 				fi
-			;;
+				;;
 			movVar) output=${TOKENS[$len1]}
-			;;
+				;;
 			execute)
 				if [[ $instruction == stop ]]; then
 					exit 0
 				elif [[ $instruction == output ]]; then
 				 	echo "$output"
 				fi
-			;;
+				;;
 		esac
 	done
 	
@@ -113,8 +114,8 @@ function interpreter () {
 if [[ $# -eq 0 ]]; then
 	stdin
 else
-	for file in $@; do
-		src $file
+	for file in "$@"; do
+		src "$file"
 	done
 fi
 # Check DEBUG
