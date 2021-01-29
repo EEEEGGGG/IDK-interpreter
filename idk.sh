@@ -40,13 +40,14 @@ function interpreter () {
 					instruction="2"
 				fi
 				;;
-			movVar) output=${TOKENS[$len1]}
+			movVar) 
+				variable=${TOKENS[$len1]}
 				;;
 			execute)
-				if [[ $instruction -eq 1 ]]; then
+				if [[ $instruction == 1 ]]; then
 					exit 0
-				elif [[ $instruction -eq 2 ]]; then
-				 	echo "$output"
+				elif [[ $instruction == 2 ]]; then
+				 	echo "$variable"
 				fi
 				;;
 		esac
