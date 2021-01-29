@@ -36,17 +36,17 @@ function interpreter () {
 				;;
 			extract)
 				if [[ $inst -eq 1 ]]; then
-			         	instruction="stop"
+			         	instruction="1"
 				elif [[ $inst -eq 2 ]]; then
-					instruction="output"
+					instruction="2"
 				fi
 				;;
 			movVar) output=${TOKENS[$len1]}
 				;;
 			execute)
-				if [[ $instruction == stop ]]; then
+				if [[ $instruction -eq 1 ]]; then
 					exit 0
-				elif [[ $instruction == output ]]; then
+				elif [[ $instruction == 2 ]]; then
 				 	echo "$output"
 				fi
 				;;
