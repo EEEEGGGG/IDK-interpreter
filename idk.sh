@@ -1,8 +1,8 @@
 #!/usr/bin/env bash 
 
-set -xv
 # Set to enable Debugging
-DEBUG=1
+#set -xv
+#DEBUG=1
 # Convert to tokens
 function token () {
 	readarray -t TOKENS
