@@ -24,7 +24,14 @@ function interpreter () {
 		exit 1
 	fi
 
-	for (( len = 0, len1 = 1; len < ${#TOKENS[@]}; len++, len1++ )); do
+	## For loop when len is 0 if first argument is null, otherwise set the first argument to len,
+	## when len1 is len + 1,
+	## when len2 is len - 1,
+	## when len22 is len2 -1,
+	## when len is less than the number of elements in TOKEN array,
+	## Increment after len, Increment after len1, Increment after len2, Increment after len22.
+	for (( len = ${1:-0}, len1 = $((len + 1)), len2 = $((len - 1 )), len22 = $((len2 - 1)); len < ${#TOKENS[@]}; len++, len1++, len2++, len22++ )); do
+		### Case TOKEN
 		case ${TOKENS[$len]} in
 			movLoc)
 				if [[ ${TOKENS[$len1]} -eq 1 ]]; then
@@ -33,6 +40,7 @@ function interpreter () {
 					inst=2
 				fi
 				;;
+
 			extract)
 				if [[ $inst -eq 1 ]]; then
 			         	instruction="1"
@@ -40,9 +48,11 @@ function interpreter () {
 					instruction="2"
 				fi
 				;;
+
 			movVar) 
 				variable=${TOKENS[$len1]}
 				;;
+
 			execute)
 				if [[ $instruction == 1 ]]; then
 					exit 0
@@ -50,15 +60,33 @@ function interpreter () {
 				 	echo "$variable"
 				fi
 				;;
+
 			isolate)
-				echo "I still don't understand, what is this?"
+				if [[ "$variable" == "$instruction" ]]; then
+					isolate=1
+				fi
 				;;
+
 			isolateX)
-				echo "What is this?"
+				##### Memory stack
+				isolateX=$len
+				mem_stack[$len]=( "$inst" )
 				;;
+
+			openJump)
+				#####  Check if isolate is set,
+				##### Else If isolateX is set
+				if [[ -n $isolate ]]; then
+					interpreter "$inst"
+				elif [[ -n $isolateX ]]; then
+					interpreter "${memstack[$len2]}"
+				fi
+				;;
+
 			pause)
 				sleep 1
 				;;
+
 		esac
 	done
 	
@@ -127,10 +155,12 @@ else
 		src "$file"
 	done
 fi
+
 # Check DEBUG
 if [[ -n $DEBUG ]]; then
 	echo "Tokens: ${TOKENS[*]}"
 	echo "BOF: ${TOKENS[0]}"
 	echo "EOF: ${TOKENS[-1]}"
 fi
+
 interpreter
