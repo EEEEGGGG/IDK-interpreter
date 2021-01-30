@@ -80,8 +80,12 @@ function interpreter () {
 				;;
 
 			openJump)
-				if [[ -n $line ]]; then
-					interpreter "$line" $((line + 1)) $((line - 1)) $((line - 2))
+				[[ -n $line ]] && interpreter "$line" $((line + 1)) $((line - 1)) $((line - 2))
+				;;
+
+			if)
+				if [[ $variable == $instruction  ]]; then
+					[[ -n $line ]] && interpreter "$line" $((line +1)) $((line - 1 )) $((line -2))
 				fi
 				;;
 
