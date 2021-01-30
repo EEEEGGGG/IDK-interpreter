@@ -1,8 +1,8 @@
 #!/usr/bin/env bash 
 
 # Uncomment to enable debugging
-set -xv
-DEBUG=1
+##set -xv
+##DEBUG=1
 
 # Error
 function error_exit () {
@@ -33,14 +33,14 @@ function interpreter () {
 	## Where len is less than the number of elements in TOKEN array,
 	## Increment after len, Increment before len1, Decrement after len1, Decrement before len2.
 	for (( len = ${1:-0}, len1 = ${2:-$((len + 1))}, len_1 = ${3:-$((len - 1))}, len_2 = ${4:-$((len - 2))}; len < ${#TOKENS[@]}; len++, len1++, len_1++, len_2++)); do
-		[[ -n $DEBUG ]] && echo "$len $len1 $len_1 $len_2" 
 		### Case TOKEN
 		case ${TOKENS[$len]} in
 			movLoc)
-				if [[ ${TOKENS[$len1]} -eq 1 ]]; then
-					inst=1
-				elif [[ ${TOKENS[$len1]} -eq 2 ]]; then
-					inst=2
+				#### Check if integer
+				if [[ ${TOKENS[$len1]} =~ ^[0-9]+$ ]]; then
+					inst=${TOKENS[$len1]}
+				else
+					error_exit "Not an integer"
 				fi
 				;;
 
@@ -49,6 +49,8 @@ function interpreter () {
 			         	instruction="1"
 				elif [[ $inst -eq 2 ]]; then
 					instruction="2"
+				elif [[ $inst -eq 2 ]]; then
+					instruction="3"
 				fi
 				;;
 
@@ -61,16 +63,22 @@ function interpreter () {
 					exit 0
 				elif [[ $instruction == 2 ]]; then
 				 	echo "$variable"
+				elif [[ $instruction == 3 ]]; then
+					read -r variable
 				fi
 				;;
 
 			isolate)
-				[[ -n ${TOKEN[$len1]} ]] && line=$len1
+				[[ -n $inst ]] && line=$inst
 				;;
 
 			isolateX)
 				##### Memory stack
-				[[ -n ${TOKEN[$len1]} ]] && export memstack[$len_1]=( "${TOKEN[$len_1]}" )
+				set -xv
+				if [[ -n ${inst} ]]; then
+					export memstack+=( "${TOKENS[$((inst - 1))]}" )
+				fi
+				set -xv
 				;;
 
 			openJump)
@@ -151,11 +159,12 @@ else
 	stdin
 fi
 
+interpreter
+
 # Check DEBUG
 if [[ -n $DEBUG ]]; then
 	echo "Tokens: ${TOKENS[*]}"
 	echo "BOF: ${TOKENS[0]}"
 	echo "EOF: ${TOKENS[-1]}"
+	echo "Memory Stack: ${memstack[*]}"
 fi
-
-interpreter
