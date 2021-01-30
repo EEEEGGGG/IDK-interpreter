@@ -6,7 +6,7 @@
 
 # Error
 function error_exit () {
-	echo "$@" >&2
+	printf '\aerror: '"$@" >&2
 	exit 1
 }
 
