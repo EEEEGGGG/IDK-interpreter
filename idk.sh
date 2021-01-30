@@ -28,11 +28,10 @@ function interpreter () {
 	## Check if BOF exists
 	[[ ${TOKENS[0]} == openC ]] || error_exit "No openC at BOF"
 	
-	## For loop when len is 0 if first argument is null, otherwise set the first argument to len,
-	## Where len1, len_1, len_2 are 0
-	## Where len is less than the number of elements in TOKEN array,
-	## Increment after len, Increment before len1, Decrement after len1, Decrement before len2.
-	for (( len = ${1:-0}, len1 = ${2:-$((len + 1))}, len_1 = ${3:-$((len - 1))}, len_2 = ${4:-$((len - 2))}; len < ${#TOKENS[@]}; len++, len1++, len_1++, len_2++)); do
+	## For loop
+	## Where len is 0 if $1 is unset or null, otherwise use $1 to len
+	## Where len1 is len + 1 if $2 is unset or null, otherwise use $2 to len1
+	for (( len = ${1:-0}, len1 = ${2:-$((len + 1))}; len < ${#TOKENS[@]}; len++, len1++, len_1++, len_2++)); do
 		### Case TOKEN
 		case ${TOKENS[$len]} in
 			movLoc)
@@ -80,12 +79,12 @@ function interpreter () {
 				;;
 
 			openJump)
-				[[ -n $line ]] && interpreter "$line" $((line + 1)) $((line - 1)) $((line - 2))
+				[[ -n $line ]] && interpreter "$line" $((line + 1))
 				;;
 
 			if)
 				if [[ $variable == $instruction  ]]; then
-					[[ -n $line ]] && interpreter "$line" $((line +1)) $((line - 1 )) $((line -2))
+					[[ -n $line ]] && interpreter "$line" $((line + 1))
 				fi
 				;;
 
