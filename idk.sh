@@ -4,6 +4,12 @@
 set -xv
 DEBUG=1
 
+# Error
+function error_exit () {
+	echo "$@" >&2
+	exit 1
+}
+
 # stdin
 function stdin () {
 	## Get input and put it into an array to TOKENS
@@ -20,17 +26,14 @@ function src () {
 # Run the interpreter
 function interpreter () {
 	## Check if BOF exists
-	if [[ ${TOKENS[0]} != openC ]]; then
-		exit 1
-	fi
-
+	[[ ${TOKENS[0]} == openC ]] || error_exit "No openC at BOF"
+	
 	## For loop when len is 0 if first argument is null, otherwise set the first argument to len,
-	## when len1 is len + 1,
-	## when len_1 is len - 1,
-	## when len_2 is len - 2,
-	## when len is less than the number of elements in TOKEN array,
-	## Increment after len, Increment after len1, Increment after len2, Increment after len22.
-	for (( len = ${1:-0}, len1 = $((len + 1)), len_1 = $((len - 1)), len_2 = $((len - 2)); len < ${#TOKENS[@]}; len++, len1++, len_1++, len_2++)); do
+	## Where len1, len_1, len_2 are 0
+	## Where len is less than the number of elements in TOKEN array,
+	## Increment after len, Increment before len1, Decrement after len1, Decrement before len2.
+	for (( len = ${1:-0}, len1 = ${2:-$((len + 1))}, len_1 = ${3:-$((len - 1))}, len_2 = ${4:-$((len - 2))}; len < ${#TOKENS[@]}; len++, len1++, len_1++, len_2++)); do
+		[[ -n $DEBUG ]] && echo "$len $len1 $len_1 $len_2" 
 		### Case TOKEN
 		case ${TOKENS[$len]} in
 			movLoc)
@@ -62,22 +65,17 @@ function interpreter () {
 				;;
 
 			isolate)
-				if [[ -n $len1 ]]; then
-					line=${TOKENS[$len1]}
-				fi
+				[[ -n ${TOKEN[$len1]} ]] && line=$len1
 				;;
 
 			isolateX)
 				##### Memory stack
-				if [[ -n $len1 ]]; then
-					memstack[$len1]=( "${TOKEN[$len1]}" )
-				fi
+				[[ -n ${TOKEN[$len1]} ]] && export memstack[$len_1]=( "${TOKEN[$len_1]}" )
 				;;
 
 			openJump)
 				if [[ -n $line ]]; then
-					interpreter $line
-				elif [[ -n $memstack[$len] ]]; then
+					interpreter "$line" $((line + 1)) $((line - 1)) $((line - 2))
 				fi
 				;;
 
@@ -89,10 +87,7 @@ function interpreter () {
 	done
 	
 	## Check if EOF exists
-	if [[ ${TOKENS[-1]} != closeC ]]; then
-		echo "Error, no 'closeC' at EOF"
-		exit 2
-	fi
+	[[ ${TOKENS[-1]} == closeC ]] || error_exit "Error, no 'closeC' at EOF"
 }
 
 # Show usage
@@ -146,12 +141,14 @@ function interpreter () {
 ##done
 
 # Check if no argument is provided
-if [[ $# -eq 0 ]]; then
-	stdin
+if (( $# )); then
+	if [[ -e $1 ]]; then
+		src "$1"
+	else
+		error_exit "No such file $1"
+	fi
 else
-	for file in "$@"; do
-		src "$file"
-	done
+	stdin
 fi
 
 # Check DEBUG
