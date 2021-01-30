@@ -31,7 +31,7 @@ function interpreter () {
 	## For loop
 	## Where len is 0 if $1 is unset or null, otherwise use $1 to len
 	## Where len1 is len + 1 if $2 is unset or null, otherwise use $2 to len1
-	for (( len = ${1:-0}, len1 = ${2:-$((len + 1))}; len < ${#TOKENS[@]}; len++, len1++, len_1++, len_2++)); do
+	for (( len = ${1:-0}, len1 = ${2:-$((len + 1))}; len < ${#TOKENS[@]}; len++, len1++ )); do
 		### Case TOKEN
 		case ${TOKENS[$len]} in
 			movLoc)
