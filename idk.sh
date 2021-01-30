@@ -26,11 +26,11 @@ function interpreter () {
 
 	## For loop when len is 0 if first argument is null, otherwise set the first argument to len,
 	## when len1 is len + 1,
-	## when len-1 is len - 1,
-	## when len-2 is len - 2,
+	## when len_1 is len - 1,
+	## when len_2 is len - 2,
 	## when len is less than the number of elements in TOKEN array,
 	## Increment after len, Increment after len1, Increment after len2, Increment after len22.
-	for (( len = ${1:-0}, len1 = $((len + 1)), len-1 = $((len - 1 )), len-2 = $((len - 2)); len < ${#TOKENS[@]}; len++, len1++, len-1++, len-2++ )); do
+	for (( len = ${1:-0}, len1 = $((len + 1)), len_1 = $((len - 1)), len_2 = $((len - 2)); len < ${#TOKENS[@]}; len++, len1++, len_1++, len_2++)); do
 		### Case TOKEN
 		case ${TOKENS[$len]} in
 			movLoc)
@@ -69,17 +69,17 @@ function interpreter () {
 
 			isolateX)
 				##### Memory stack
-				isolateX=$len
+				isolateX=1
 				memstack[$len]=( "$inst" )
 				;;
 
 			openJump)
-				#####  Check if isolate is set,
+				##### Check if isolate is set,
 				##### Else If isolateX is set
 				if [[ -n $isolate ]]; then
 					interpreter "$inst"
 				elif [[ -n $isolateX ]]; then
-					interpreter "${memstack[$len-1]}"
+					interpreter "${memstack[$len_2]}"
 				fi
 				;;
 
