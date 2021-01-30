@@ -2,7 +2,7 @@
 
 # Uncomment to enable debugging
 ##set -xv
-##DEBUG=1
+DEBUG=1
 
 # Error
 function error_exit () {
@@ -49,7 +49,7 @@ function interpreter () {
 			         	instruction="1"
 				elif [[ $inst -eq 2 ]]; then
 					instruction="2"
-				elif [[ $inst -eq 2 ]]; then
+				elif [[ $inst -eq 3 ]]; then
 					instruction="3"
 				fi
 				;;
@@ -166,5 +166,6 @@ if [[ -n $DEBUG ]]; then
 	echo "Tokens: ${TOKENS[*]}"
 	echo "BOF: ${TOKENS[0]}"
 	echo "EOF: ${TOKENS[-1]}"
-	echo "Memory Stack: ${memstack[*]}"
+	## Check if Memory Stack exists, otherwise don't output anything
+	[[ -n ${memstack[*]} ]] && echo "Memory Stack: ${memstack[*]}"
 fi
