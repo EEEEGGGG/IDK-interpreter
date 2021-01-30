@@ -1,8 +1,8 @@
 #!/usr/bin/env bash 
 
 # Uncomment to enable debugging
-##set -xv
-##DEBUG=1
+set -xv
+DEBUG=1
 
 # stdin
 function stdin () {
@@ -62,24 +62,22 @@ function interpreter () {
 				;;
 
 			isolate)
-				if [[ "$variable" == "$instruction" ]]; then
-					isolate=1
+				if [[ -n $len1 ]]; then
+					line=${TOKENS[$len1]}
 				fi
 				;;
 
 			isolateX)
 				##### Memory stack
-				isolateX=1
-				memstack[$len]=( "$inst" )
+				if [[ -n $len1 ]]; then
+					memstack[$len1]=( "${TOKEN[$len1]}" )
+				fi
 				;;
 
 			openJump)
-				##### Check if isolate is set,
-				##### Else If isolateX is set
-				if [[ -n $isolate ]]; then
-					interpreter "$inst"
-				elif [[ -n $isolateX ]]; then
-					interpreter "${memstack[$len_2]}"
+				if [[ -n $line ]]; then
+					interpreter $line
+				elif [[ -n $memstack[$len] ]]; then
 				fi
 				;;
 
