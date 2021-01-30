@@ -6,7 +6,7 @@
 
 # Error
 function error_exit () {
-	printf '\aerror: '"$@" >&2
+	printf '\aerror: %s' "$@" >&2
 	exit 1
 }
 
@@ -62,7 +62,7 @@ function interpreter () {
 				;;
 
 			execute)
-				case $instructiont in
+				case $instruction in
 					1)
 						exit 0
 						;;
@@ -89,7 +89,7 @@ function interpreter () {
 				;;
 
 			if)
-				if [[ $variable == $instruction  ]]; then
+				if [[ "$variable" == "$instruction"  ]]; then
 					[[ -n $line ]] && interpreter "$line" $((line + 1))
 				fi
 				;;
