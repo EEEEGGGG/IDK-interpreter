@@ -70,7 +70,7 @@ function interpreter () {
 			isolateX)
 				##### Memory stack
 				isolateX=$len
-				mem_stack[$len]=( "$inst" )
+				memstack[$len]=( "$inst" )
 				;;
 
 			openJump)
