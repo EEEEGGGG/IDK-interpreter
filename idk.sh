@@ -44,13 +44,17 @@ function interpreter () {
 				;;
 
 			extract)
-				if [[ $inst -eq 1 ]]; then
-			         	instruction="1"
-				elif [[ $inst -eq 2 ]]; then
-					instruction="2"
-				elif [[ $inst -eq 3 ]]; then
-					instruction="3"
-				fi
+				case $inst in
+					1)
+						instruction="1"
+						;;
+					2)
+						instruction="2"
+						;;
+					3)
+						instruction="3"
+						;;
+				esac
 				;;
 
 			movVar) 
@@ -58,13 +62,17 @@ function interpreter () {
 				;;
 
 			execute)
-				if [[ $instruction == 1 ]]; then
-					exit 0
-				elif [[ $instruction == 2 ]]; then
-				 	echo "$variable"
-				elif [[ $instruction == 3 ]]; then
-					read -r variable
-				fi
+				case $instructiont in
+					1)
+						exit 0
+						;;
+					2)
+						echo "$variable"
+						;;
+					3)
+						read -r variable
+						;;
+				esac
 				;;
 
 			isolate)
@@ -73,9 +81,7 @@ function interpreter () {
 
 			isolateX)
 				##### Memory stack
-				if [[ -n ${inst} ]]; then
-					export memstack+=( "${TOKENS[$((inst - 1))]}" )
-				fi
+				[[ -n ${inst} ]] && export memstack+=( "${TOKENS[$((inst - 1))]}" )
 				;;
 
 			openJump)
