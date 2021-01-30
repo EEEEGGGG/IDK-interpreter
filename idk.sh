@@ -2,7 +2,7 @@
 
 # Uncomment to enable debugging
 ##set -xv
-DEBUG=1
+##DEBUG=1
 
 # Error
 function error_exit () {
@@ -74,11 +74,9 @@ function interpreter () {
 
 			isolateX)
 				##### Memory stack
-				set -xv
 				if [[ -n ${inst} ]]; then
 					export memstack+=( "${TOKENS[$((inst - 1))]}" )
 				fi
-				set -xv
 				;;
 
 			openJump)
