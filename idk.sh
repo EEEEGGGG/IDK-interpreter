@@ -1,22 +1,18 @@
 #!/usr/bin/env bash 
 
-# Uncomment to enable debugging
-##set -xv
-##DEBUG=1
-
 # Error
 function error_exit () {
 	printf '\aerror: %s' "$@" >&2
 	exit 1
 }
 
-# stdin
+# Stdin
 function stdin () {
 	## Get input and put it into an array to TOKENS
 	readarray -t TOKENS
 }
 
-# file source
+# File source
 function src () {
 	## Same as stdin but changed the name because it makes more sense
 	## Get file and change it to an array to TOKENS
@@ -107,68 +103,94 @@ function interpreter () {
 
 # Show usage
 ##function usage () {
-##	echo "stdin: $0 -s"
+	##echo "$0 [-h|--help]"
+	##echo "$0 [-s|--stdin]"
+	##echo "$0 [-f|--file] file.idk"
+	##echo "$0 [-d|--debug] [1, 2, 3]"
+	##echo
+	##echo "Options:"
+	##echo
+	##echo "  -h --help: display this help page"
+	##echo "  -s --stdin: execute from stdin"
+	##echo "  -f --file: execute from file"
+	##echo "  -d --debug: debug script from 1-3"
+	##echo
+	##echo "Debug"
+	##echo
+	##echo "1: sets DEBUG=1"
+	##echo "2: sets 'set -xv', used for debugging the interpreter"
+	##echo "3: sets DEBUG=1 and 'set -xv'"
 ##}
 
 # Set to enable Debugging
-##while getopts ":hd:sf:" option; do
-##	case $option in
-##		h)
-##			usage
-##		;;
-##		d)
-##			case "$OPTARG" in
-##				"")
-##					DEBUG=1
-##				;;
-##				1)
-##					DEBUG=1
-##				;;
-##				2)
-##					set -xv
-##				;;
-##				3)
-##					DEBUG=1
-##					set -xv
-##				;;
-##				*)
-##					echo "Invalid DEBUG value: $OPTARG. Use 1, 2, 3"
-##					exit 3
-##				;;
-##			esac
-##		;;
-##		s)
-##			stdin
-##		;;
-##		f)
-##			if [[ -n $OPTARG ]]; then
-##				for file in $OPTARG; do
-##					src "$file"
-##				done
-##			else
-##				echo "Option -f defined but no argument."
-##				exit 4
-##			fi
-##		;;
-##		*)
-##			echo "Unknown option"
-##	esac
+##option=$(getopt -o 'hsf:d::' -a -l 'help,stdin,file:,debug::' -q -n "$0" -- "$@")
+##eval set -- "$option"
+##unset option
+##while true; do
+	##case $1 in
+		##'-h'|'--help')
+			##usage
+			##shift
+			##break
+			##;;
+
+		##'-s'|'--stdin')
+			##stdin
+			##shift
+			##continue
+			##;;
+
+		##'-f'|'--file')
+			##if [[ -f $2 ]]; then
+				##src "$2"
+			##fi
+			##shift 2
+			##break
+			##;;
+		##'-d'|'--debug')
+			##case "$2" in
+				##'')
+					##DEBUG=1
+					##shift 2
+					##;;
+
+				##1|2|3)
+					##DEBUG="$2"
+					##shift 2
+					##;;
+				
+				##*)
+					##error_exit "Unknown error value"
+					##break 1
+					##;;
+			##esac
+			##;;
+
+		##'--')
+			##stdin
+			##break
+			##;;
+
+		##*)
+			##error_exit "Unknown error"
+			##;;
+	##esac
 ##done
 
-# Check if no argument is provided
 if (( $# )); then
-	if [[ -e $1 ]]; then
-		src "$1"
-	else
-		error_exit "No such file $1"
-	fi
+	for file in $@; do
+		src "$file"
+		interpreter
+		unset len len1
+	done
 else
 	stdin
+	interpreter
 fi
-
-interpreter
+##[[ $DEBUG == 2 || $DEBUG == 3 ]] && set -xv
 
 # Check DEBUG
+##if [[ $DEBUG == 1 || $DEBUG == 3 ]]; then
 if [[ -n $DEBUG ]]; then
 	echo "Tokens: ${TOKENS[*]}"
 	echo "BOF: ${TOKENS[0]}"
@@ -176,3 +198,5 @@ if [[ -n $DEBUG ]]; then
 	## Check if Memory Stack exists, otherwise don't output anything
 	[[ -n ${memstack[*]} ]] && echo "Memory Stack: ${memstack[*]}"
 fi
+
+##[[ $DEBUG == 2 || $DEBUG == 3 ]] && set +xv
