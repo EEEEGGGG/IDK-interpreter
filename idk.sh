@@ -90,7 +90,7 @@ function interpreter () {
 				;;
 
 			if)
-				[[ $variable == $instruction ]] && interpreter "$line" $((line + 1))
+				[[ $variable == "$instruction" ]] && interpreter "$line" $((line + 1))
 				;;
 
 			pause)
