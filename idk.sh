@@ -51,25 +51,11 @@ function interpreter () {
 		case ${TOKENS[$len]} in
 			movLoc)
 				#### Check if integer
-				if [[ ${TOKENS[$len1]} =~ ^[0-9]+$ ]]; then
-					inst=${TOKENS[$len1]}
-				else
-					error_exit "Not an integer"
-				fi
+				[[ ${TOKENS[$len1]} =~ ^[0-9]+$ ]] && inst+=( "${TOKENS[$len1]}" )
 				;;
 
 			extract)
-				case $inst in
-					1)
-						instruction="1"
-						;;
-					2)
-						instruction="2"
-						;;
-					3)
-						instruction="3"
-						;;
-				esac
+				instruction="${inst[-1]}"
 				;;
 
 			movVar) 
@@ -91,22 +77,20 @@ function interpreter () {
 				;;
 
 			isolate)
-				[[ -n $inst ]] && line=$inst
+				line=${inst[-1]}
 				;;
 
 			isolateX)
 				##### Memory stack
-				[[ -n ${inst} ]] && export memstack+=( "${TOKENS[$((inst - 1))]}" )
+				export memstack+=( "${TOKENS[${inst[-1]}]}" )
 				;;
 
 			openJump)
-				[[ -n $line ]] && interpreter "$line" $((line + 1))
+				interpreter "$line" $((line + 1))
 				;;
 
 			if)
-				if [[ "$variable" == "$instruction"  ]]; then
-					[[ -n $line ]] && interpreter "$line" $((line + 1))
-				fi
+				[[ $variable == $instruction ]] && interpreter "$line" $((line + 1))
 				;;
 
 			pause)
@@ -197,7 +181,7 @@ function interpreter () {
 ##done
 
 if (( $# )); then
-	for file in $@; do
+	for file in "$@"; do
 		src "$file"
 		interpreter
 		debug
