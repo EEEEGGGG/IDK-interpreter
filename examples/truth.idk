@@ -9,11 +9,12 @@ movLoc
 3
 extract
 execute
-movVar
-0
 movLoc
 26
 isolate
+movLoc
+0
+extract
 if
 movLoc
 36
