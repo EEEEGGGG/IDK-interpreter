@@ -1,5 +1,13 @@
 #!/usr/bin/env bash 
 
+# Debugging
+## Add DEBUG=1 to idk.sh
+### DEBUG=1 ./idk.sh
+## Or add set -xv to idk.sh
+### bash -xv idk.sh
+## Or both.
+### DEBUG=1 bash -xv idk.sh
+
 # Error
 function error_exit () {
 	printf '\aerror: %s' "$@" >&2
