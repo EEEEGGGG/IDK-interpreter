@@ -19,6 +19,17 @@ function src () {
 	mapfile -t TOKENS < "$1"
 }
 
+# Check DEBUG
+function debug () {
+	if [[ -n $DEBUG ]]; then
+		echo "Tokens: ${TOKENS[*]}"
+		echo "BOF: ${TOKENS[0]}"
+		echo "EOF: ${TOKENS[-1]}"
+		## Check if Memory Stack exists, otherwise don't output anything
+		[[ -n ${memstack[*]} ]] && echo "Memory Stack: ${memstack[*]}"
+	fi
+}
+
 # Run the interpreter
 function interpreter () {
 	## Check if BOF exists
@@ -181,22 +192,11 @@ if (( $# )); then
 	for file in $@; do
 		src "$file"
 		interpreter
+		debug
 		unset len len1
 	done
 else
 	stdin
+	debug
 	interpreter
 fi
-##[[ $DEBUG == 2 || $DEBUG == 3 ]] && set -xv
-
-# Check DEBUG
-##if [[ $DEBUG == 1 || $DEBUG == 3 ]]; then
-if [[ -n $DEBUG ]]; then
-	echo "Tokens: ${TOKENS[*]}"
-	echo "BOF: ${TOKENS[0]}"
-	echo "EOF: ${TOKENS[-1]}"
-	## Check if Memory Stack exists, otherwise don't output anything
-	[[ -n ${memstack[*]} ]] && echo "Memory Stack: ${memstack[*]}"
-fi
-
-##[[ $DEBUG == 2 || $DEBUG == 3 ]] && set +xv
