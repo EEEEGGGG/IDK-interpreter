@@ -2,3 +2,5 @@
 *~
 *.swp
 *.swo
+# Visual Studio Code
+.vscode
