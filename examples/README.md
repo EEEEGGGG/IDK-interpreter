@@ -7,3 +7,5 @@ Outputs "E" in an infinite loop
 A truth machine
 ## empty.idk
 An empty program
+## cat.idk
+Repeats input, like the UNIX command `cat`.
