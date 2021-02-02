@@ -1,0 +1,12 @@
+openC
+movLoc
+2
+extract
+movVar
+
+execute
+movLoc
+2
+isolate
+openJump
+closeC
