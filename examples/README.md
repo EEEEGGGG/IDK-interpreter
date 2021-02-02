@@ -10,6 +10,6 @@ An empty program
 ## cat.idk
 Repeats input, like the UNIX command `cat`
 ## bf.idk
-BrainF*** interpreter (only in newlines)
+Incomplete BrainF*** interpreter (only in newlines)
 ## alert.idk
 Alerts you in an infinite loop
