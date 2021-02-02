@@ -8,4 +8,6 @@ A truth machine
 ## empty.idk
 An empty program
 ## cat.idk
-Repeats input, like the UNIX command `cat`.
+Repeats input, like the UNIX command `cat`
+## bf.idk
+BrainF*** interpreter

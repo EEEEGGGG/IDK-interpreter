@@ -1,0 +1,52 @@
+openC
+movLoc
+3
+extract
+execute
+movLoc
+line where +
+isolate
+movLoc
++
+extract
+if
+movLoc
+line where -
+isolate
+movLoc
+-
+exract
+if
+movLoc
+line where ,
+isolate
+movLoc
+,
+extract
+if
+movLoc
+line where .
+isolate
+movLoc
+.
+if
+movLoc
+line where [
+isolate
+movLoc
+[
+extract
+if
+movLoc
+line where ]
+isolate
+movLoc
+]
+extract
+if
+movLoc
+0
+extract
+execute
+
+closeC
