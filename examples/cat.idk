@@ -1,0 +1,10 @@
+openC
+movLoc
+3
+extract
+execute
+movLoc
+2
+extract
+execute
+closeC
