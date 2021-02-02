@@ -50,8 +50,7 @@ function interpreter () {
 		### Case TOKEN
 		case ${TOKENS[$len]} in
 			movLoc)
-				#### Check if integer
-				[[ ${TOKENS[$len1]} =~ ^[0-9]+$ ]] && inst+=( "${TOKENS[$len1]}" )
+				inst+=( "${TOKENS[$len1]}" )
 				;;
 
 			extract)
@@ -71,7 +70,7 @@ function interpreter () {
 						echo "$variable"
 						;;
 					3)
-						read -r variable
+						readarray -t variable
 						;;
 				esac
 				;;
