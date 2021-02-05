@@ -1,10 +1,14 @@
 openC
 movLoc
+2
+extract
+execute
+movLoc
 3
 extract
 execute
 movLoc
 2
-extract
-execute
+isolate
+openJump
 closeC
