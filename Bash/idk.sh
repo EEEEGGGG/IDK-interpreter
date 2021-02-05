@@ -67,7 +67,7 @@ function interpreter () {
 						exit 0
 						;;
 					2)
-						echo "$variable"
+						printf '%s\n' "${variable[@]}"
 						;;
 					3)
 						readarray -t variable
@@ -85,11 +85,11 @@ function interpreter () {
 				;;
 
 			openJump)
-				interpreter "$line" $((line + 1))
+				interpreter "$line" "$((line + 1))" variable
 				;;
 
 			if)
-				[[ $variable == "$instruction" ]] && interpreter "$line" $((line + 1))
+				[[ $variable == "$instruction" ]] && interpreter "$line" "$((line + 1))"
 				;;
 
 			pause)
