@@ -1,13 +1,5 @@
 #!/usr/bin/env bash 
 
-# Debugging
-## Add DEBUG=1 to idk.sh
-### DEBUG=1 ./idk.sh
-## Or add set -xv to idk.sh
-### bash -xv idk.sh
-## Or both.
-### DEBUG=1 bash -xv idk.sh
-
 # Error
 function error_exit () {
 	printf '\aerror: %s' "$@" >&2
@@ -29,12 +21,15 @@ function src () {
 
 # Check DEBUG
 function debug () {
-	if [[ -n $DEBUG ]]; then
+	if [[ $DEBUG =~ [13] ]]; then
 		echo "Tokens: ${TOKENS[*]}"
 		echo "BOF: ${TOKENS[0]}"
 		echo "EOF: ${TOKENS[-1]}"
 		## Check if Memory Stack exists, otherwise don't output anything
 		[[ -n ${memstack[*]} ]] && echo "Memory Stack: ${memstack[*]}"
+	fi
+	if [[ $DEBUG =~ [23] ]]; then
+		set -xv
 	fi
 }
 
@@ -104,90 +99,81 @@ function interpreter () {
 }
 
 # Show usage
-##function usage () {
-	##echo "$0 [-h|--help]"
-	##echo "$0 [-s|--stdin]"
-	##echo "$0 [-f|--file] file.idk"
-	##echo "$0 [-d|--debug] [1, 2, 3]"
-	##echo
-	##echo "Options:"
-	##echo
-	##echo "  -h --help: display this help page"
-	##echo "  -s --stdin: execute from stdin"
-	##echo "  -f --file: execute from file"
-	##echo "  -d --debug: debug script from 1-3"
-	##echo
-	##echo "Debug"
-	##echo
-	##echo "1: sets DEBUG=1"
-	##echo "2: sets 'set -xv', used for debugging the interpreter"
-	##echo "3: sets DEBUG=1 and 'set -xv'"
-##}
+function usage () {
+	echo "$0 [-d|--debug] [1|2|3] [-hs|--help,--stdin] [-f|--file file.idk]"
+	echo "$0 [-h|--help]"
+	echo "$0 [-s|--stdin]"
+	echo "$0 [-f|--file] file.idk"
+	echo "$0 [-d|--debug] [1|2|3]"
+	echo
+	echo "Options:"
+	echo
+	echo "  -h --help: display this help page"
+	echo "  -s --stdin: execute from stdin"
+	echo "  -f --file: execute from file"
+	echo "  -d --debug: debug script from 1-3"
+	echo
+	echo "Debug"
+	echo
+	echo "1: sets DEBUG=1"
+	echo "2: sets 'set -xv', used for debugging the interpreter"
+	echo "3: sets DEBUG=1 and 'set -xv'"
+}
 
 # Set to enable Debugging
-##option=$(getopt -o 'hsf:d::' -a -l 'help,stdin,file:,debug::' -q -n "$0" -- "$@")
-##eval set -- "$option"
-##unset option
-##while true; do
-	##case $1 in
-		##'-h'|'--help')
-			##usage
-			##shift
-			##break
-			##;;
+option=$(getopt -o 'hd:sf:' -a -l 'help,debug:,stdin,file:' -q -n "$0" -- "$@")
+eval set -- "$option"
+unset option
+while true; do
+	case $1 in
+		'-h'|'--help')
+			usage
+			shift
+			break
+			;;
 
-		##'-s'|'--stdin')
-			##stdin
-			##shift
-			##continue
-			##;;
+		'-s'|'--stdin')
+			stdin
+			shift
+			;;
 
-		##'-f'|'--file')
-			##if [[ -f $2 ]]; then
-				##src "$2"
-			##fi
-			##shift 2
-			##break
-			##;;
-		##'-d'|'--debug')
-			##case "$2" in
-				##'')
-					##DEBUG=1
-					##shift 2
-					##;;
+		'-f'|'--file')
+			if [[ -f $2 ]]; then
+				src "$2"
+			fi
+			shift 2
+			;;
+		'-d'|'--debug')
+			case "$2" in
+				1|2|3)
+					DEBUG="$2"
+					shift 2
+					continue
+					;;
 
-				##1|2|3)
-					##DEBUG="$2"
-					##shift 2
-					##;;
-				
-				##*)
-					##error_exit "Unknown error value"
-					##break 1
-					##;;
-			##esac
-			##;;
+				'')
+					DEBUG=1
+					shift 2
+					continue
+					;;
 
-		##'--')
-			##stdin
-			##break
-			##;;
+				*)
+					error_exit "An argument is required, or unknown error value"
+					break 1
+					;;
+			esac
+			;;
 
-		##*)
-			##error_exit "Unknown error"
-			##;;
-	##esac
-##done
+		'--')
+			shift
+			break
+			;;
 
-if (( $# )); then
-	for file in "$@"; do
-		src "$file"
-		interpreter
-		debug
-		unset len len1
-	done
-else
-	stdin
+		*)
+			error_exit "Unknown error"
+			;;
+	esac
 	debug
-	interpreter
-fi
+	interpreter 0 1
+	unset DEBUG
+done
