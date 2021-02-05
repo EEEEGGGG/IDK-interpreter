@@ -100,11 +100,11 @@ function interpreter () {
 
 # Show usage
 function usage () {
-	echo "$0 [-d|--debug] [1|2|3] [-hs|--help,--stdin] [-f|--file file.idk]"
+	echo "$0 [-d|--debug][=| ][1|2|3] [-hs|--help,--stdin] [-f|--file file.idk]"
 	echo "$0 [-h|--help]"
 	echo "$0 [-s|--stdin]"
 	echo "$0 [-f|--file] file.idk"
-	echo "$0 [-d|--debug] [1|2|3]"
+	echo "$0 [-d|--debug][=| ][1|2|3]"
 	echo
 	echo "Options:"
 	echo
@@ -140,6 +140,9 @@ while true; do
 		'-f'|'--file')
 			if [[ -f $2 ]]; then
 				src "$2"
+			else
+				error_exit "File '$2' does not exist"
+				break 1
 			fi
 			shift 2
 			;;
@@ -166,7 +169,12 @@ while true; do
 
 		'--')
 			shift
-			break
+			if [[ -z $1 ]]; then
+				break
+			else
+				error_exit "Using file without options is deprecated, use -f $1 instead."
+				break 1
+			fi
 			;;
 
 		*)
@@ -175,5 +183,5 @@ while true; do
 	esac
 	debug
 	interpreter 0 1
-	unset DEBUG
+	unset DEBUG TOKENS
 done
