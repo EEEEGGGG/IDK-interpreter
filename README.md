@@ -3,27 +3,27 @@
 ### Debug IDK programs 
 #### Bash
 ```bash
-./idk.sh -d 1 file.idk
+./idk.sh -d 1 -f file.idk
 ```
 
 ```bash
-./idk.sh --debug 1 file.idk
+./idk.sh --debug 1 --file file.idk
 ```
 ### Debug the Interpreter
 ```bash
-./idk.sh -d 2 file.idk
+./idk.sh -d 2 -f file.idk
 ```
 
 ```bash
-./idk.sh --debug 2 file.idk
+./idk.sh --debug 2 --file file.idk
 ```
 ### Or both
 ```bash
-./idk.sh -d 3 file.idk
+./idk.sh -d 3 -f file.idk
 ```
 
 ```bash
-./idk.sh --debug 3 file.idk
+./idk.sh --debug 3 --file file.idk
 ```
 ## Usage
 ### stdin
