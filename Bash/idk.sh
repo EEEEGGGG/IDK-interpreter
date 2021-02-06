@@ -100,10 +100,13 @@ function interpreter () {
 
 # Show usage
 function usage () {
-	echo "$0 [-d|--debug][=| ][1|2|3] [-hs|--help,--stdin] [-f|--file file.idk]"
+	echo "Collapsed:"
+	echo "$0 [-d|--debug][=| ][1|2|3] [-hs|--help,--stdin] [-f|--file][=| ][file.idk]"
+	echo "More Readable:"
 	echo "$0 [-h|--help]"
 	echo "$0 [-s|--stdin]"
-	echo "$0 [-f|--file] file.idk"
+	echo "$0 [-f|--file][=| ]file.idk"
+	echo "$0 [--all-files][=| ]file.idk file1.idk file2.idk"
 	echo "$0 [-d|--debug][=| ][1|2|3]"
 	echo
 	echo "Options:"
@@ -112,16 +115,20 @@ function usage () {
 	echo "  -s --stdin: execute from stdin"
 	echo "  -f --file: execute from file"
 	echo "  -d --debug: debug script from 1-3"
+	#echo "  --all-files: instead of one by one adding -f or --file, execute all files. Note that this will also debug for all files if debug option is set. You also would not place other options conjuction with this option because it is marked as a file after it."
 	echo
-	echo "Debug"
+	echo "Debug:"
 	echo
 	echo "1: sets DEBUG=1"
 	echo "2: sets 'set -xv', used for debugging the interpreter"
 	echo "3: sets DEBUG=1 and 'set -xv'"
+	echo
+	echo "Notes:"
+	echo "| means or"
 }
 
 # Set to enable Debugging
-option=$(getopt -o 'hd:sf:' -a -l 'help,debug:,stdin,file:' -q -n "$0" -- "$@")
+option=$(getopt -o 'hd:sf:' -a -l 'help,debug:,stdin,file:,all-files:' -q -n "$0" -- "$@")
 eval set -- "$option"
 unset option
 while true; do
@@ -146,6 +153,7 @@ while true; do
 			fi
 			shift 2
 			;;
+
 		'-d'|'--debug')
 			case "$2" in
 				1|2|3)
@@ -161,7 +169,7 @@ while true; do
 					;;
 
 				*)
-					error_exit "An argument is required, or unknown error value"
+					error_exit "Debug option requires an argument is required, or unknown error value"
 					break 1
 					;;
 			esac
@@ -169,12 +177,7 @@ while true; do
 
 		'--')
 			shift
-			if [[ -z $1 ]]; then
-				break
-			else
-				error_exit "Using file without options is deprecated, use -f $1 instead."
-				break 1
-			fi
+			break
 			;;
 
 		*)
