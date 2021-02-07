@@ -1,59 +1,54 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
 
 # Error
 function error_exit () {
-	printf '\aerror: %s' "$@" >&2
+	printf '\aerror: %s' "$@" >&2 ## Print error with "bell" to argument in stderr
 	exit 1
 }
 
 # Stdin
 function stdin () {
-	## Get input and put it into an array to TOKENS
-	readarray -t TOKENS
+	## mapfile = readarray
+	readarray -t TOKENS ## Get input
 }
 
-# File source
+# File
 function src () {
-	## Same as stdin but changed the name because it makes more sense
-	## Get file and change it to an array to TOKENS
-	mapfile -t TOKENS < "$1"
+	## mapfile = readarray
+	mapfile -t TOKENS < "$1" ## Get file
 }
 
 # Check DEBUG
 function debug () {
+	## Check if DEBUG is either 1 or 3
 	if [[ $DEBUG =~ [13] ]]; then
 		echo "Tokens: ${TOKENS[*]}"
 		echo "BOF: ${TOKENS[0]}"
 		echo "EOF: ${TOKENS[-1]}"
-		## Check if Memory Stack exists, otherwise don't output anything
-		[[ -n ${memstack[*]} ]] && echo "Memory Stack: ${memstack[*]}"
+		[[ -n ${memstack[*]} ]] && echo "Memory Stack: ${memstack[*]}" ### Check if Memory Stack exists
 	fi
+	## Check if DEBUG is either 2 or 3
 	if [[ $DEBUG =~ [23] ]]; then
-		set -xv
+		set -xv ### set verbose and xtrace
 	fi
 }
 
-# Run the interpreter
+# Interpreter
 function interpreter () {
-	## Check if BOF exists
-	[[ ${TOKENS[0]} == openC ]] || error_exit "No openC at BOF"
-	
-	## For loop
-	## Where len is 0 if $1 is unset or null, otherwise use $1 to len
-	## Where len1 is len + 1 if $2 is unset or null, otherwise use $2 to len1
-	for (( len = ${1:-0}, len1 = ${2:-$((len + 1))}; len < ${#TOKENS[@]}; len++, len1++ )); do
-		### Case TOKEN
-		case ${TOKENS[$len]} in
+	[[ ${TOKENS[0]} == openC ]] || error_exit "No openC at BOF" ## Check if BOF exists
+
+	for (( line_pointer = ${1:-0}, line_pointer1 = ${2:-$((line_pointer + 1))}; line_pointer < ${#TOKENS[@]}; line_pointer++, line_pointer1++ )); do
+		case ${TOKENS[$line_pointer]} in
 			movLoc)
-				inst+=( "${TOKENS[$len1]}" )
+				stack+=( "${TOKENS[$line_pointer]}" ) #### Append to Stack
 				;;
 
 			extract)
-				instruction="${inst[-1]}"
+				instruction="${stack[-1]}" #### Add last element
 				;;
 
-			movVar) 
-				variable=${TOKENS[$len1]}
+			movVar)
+				variable=${TOKENS[$line_pointer1]}
 				;;
 
 			execute)
@@ -71,20 +66,19 @@ function interpreter () {
 				;;
 
 			isolate)
-				line=${inst[-1]}
+				line=${stack[-1]}
 				;;
 
 			isolateX)
-				##### Memory stack
-				export memstack+=( "${TOKENS[${inst[-1]}]}" )
+				export memstack+=( "${TOKENS[${stack[-1]}]}" ) #### Append to Memory Stack
 				;;
 
 			openJump)
-				interpreter "$line" "$((line + 1))" variable
+				interpreter "$line" "$((line + 1))" #### Recurse through the interpreter
 				;;
 
 			if)
-				[[ $variable == "$instruction" ]] && interpreter "$line" "$((line + 1))"
+				[[ $variable == "$instruction" ]] && interpreter "$line" "$((line + 1))" #### If variable is equal to instruction, recurse through interpreter
 				;;
 
 			pause)
@@ -93,9 +87,8 @@ function interpreter () {
 
 		esac
 	done
-	
-	## Check if EOF exists
-	[[ ${TOKENS[-1]} == closeC ]] || error_exit "Error, no 'closeC' at EOF"
+
+	[[ ${TOKENS[-1]} == closeC ]] || error_exit "Error, no 'closeC' at EOF" ## Check if EOF exists
 }
 
 # Show usage
@@ -127,64 +120,69 @@ function usage () {
 	echo "| means or"
 }
 
-# Set to enable Debugging
-option=$(getopt -o 'hd:sf:' -a -l 'help,debug:,stdin,file:,all-files:' -q -n "$0" -- "$@")
-eval set -- "$option"
-unset option
-while true; do
-	case $1 in
-		'-h'|'--help')
-			usage
-			shift
-			break
-			;;
+# Options
+function options () {
+	option=$(getopt -o 'hd:sf:' -a -l 'help,debug:,stdin,file:,all-files:' -q -n "$0" -- "$@")
+	eval set -- "$option"
+	unset option
+	while true; do
+		case $1 in
+			'-h'|'--help')
+				usage
+				shift
+				break
+				;;
 
-		'-s'|'--stdin')
-			stdin
-			shift
-			;;
+			'-s'|'--stdin')
+				stdin
+				shift
+				;;
 
-		'-f'|'--file')
-			if [[ -f $2 ]]; then
-				src "$2"
-			else
-				error_exit "File '$2' does not exist"
-				break 1
-			fi
-			shift 2
-			;;
-
-		'-d'|'--debug')
-			case "$2" in
-				1|2|3)
-					DEBUG="$2"
-					shift 2
-					continue
-					;;
-
-				'')
-					DEBUG=1
-					shift 2
-					continue
-					;;
-
-				*)
-					error_exit "Debug option requires an argument is required, or unknown error value"
+			'-f'|'--file')
+				if [[ -f $2 ]]; then
+					src "$2"
+				else
+					error_exit "File '$2' does not exist"
 					break 1
-					;;
-			esac
-			;;
+				fi
+				shift 2
+				;;
 
-		'--')
-			shift
-			break
-			;;
+			'-d'|'--debug')
+				case "$2" in
+					1|2|3)
+						DEBUG="$2"
+						shift 2
+						continue
+						;;
 
-		*)
-			error_exit "Unknown error"
-			;;
-	esac
-	debug
-	interpreter 0 1
-	unset DEBUG TOKENS
-done
+					'')
+						DEBUG=1
+						shift 2
+						continue
+						;;
+
+					*)
+						error_exit "Debug option requires an argument is required, or unknown error value"
+						break 1
+						;;
+				esac
+				;;
+
+			'--')
+				shift
+				break
+				;;
+
+			*)
+				error_exit "Unknown error"
+				;;
+		esac
+		debug
+		interpreter 0 1
+		unset DEBUG TOKENS
+	done
+}
+
+# Run
+options
