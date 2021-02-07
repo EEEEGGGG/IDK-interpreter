@@ -129,65 +129,63 @@ function usage () {
 }
 
 # Options
-function options () {
 unset option
 option=$(getopt -o 'hd:sf:' -a -l 'help,debug:,stdin,file:,all-files:' -q -n "$0" -- "$@")
 eval set -- "$option"
 while true; do
-		case ${1} in
-			'-h'|'--help')
-				usage
-				shift
-				break
-				;;
+	case ${1} in
+		'-h'|'--help')
+			usage
+			shift
+			break
+			;;
 
-			'-s'|'--stdin')
-				stdin
-				shift
-				;;
+		'-s'|'--stdin')
+			stdin
+			shift
+			;;
 
-			'-f'|'--file')
-				if [[ -f ${2} ]]; then
-					src "${2}"
-				else
-					error_exit "File '${2}' does not exist"
+		'-f'|'--file')
+			if [[ -f ${2} ]]; then
+				src "${2}"
+			else
+				error_exit "File '${2}' does not exist"
+				break 1
+			fi
+			shift 2
+			;;
+
+		'-d'|'--debug')
+			case "${2}" in
+				1|2|3)
+					DEBUG="${2}"
+					shift 2
+					continue
+					;;
+
+				'')
+					DEBUG=1
+					shift 2
+					continue
+					;;
+
+				*)
+					error_exit "Debug option requires an argument is required, or unknown error value"
 					break 1
-				fi
-				shift 2
-				;;
+					;;
+			esac
+			;;
 
-			'-d'|'--debug')
-				case "${2}" in
-					1|2|3)
-						DEBUG="${2}"
-						shift 2
-						continue
-						;;
+		'--')
+			shift
+			break
+			;;
 
-					'')
-						DEBUG=1
-						shift 2
-						continue
-						;;
-
-					*)
-						error_exit "Debug option requires an argument is required, or unknown error value"
-						break 1
-						;;
-				esac
-				;;
-
-			'--')
-				shift
-				break
-				;;
-
-			*)
-				error_exit "Unknown error"
-				;;
-		esac
-		debug
-		interpreter 0 1
-		unset DEBUG TOKENS
-	done
-}
+		*)
+			error_exit "Unknown error"
+			;;
+	esac
+	debug
+	interpreter 0 1
+	unset DEBUG TOKENS
+done
