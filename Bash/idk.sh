@@ -37,7 +37,7 @@ function debug () {
 function interpreter () {
 	[[ ${TOKENS[0]} == openC ]] || error_exit "No openC at BOF" ## Check if BOF exists
 
-	for (( pointer = ${1:-0}, pointer1 = ${2:-$((pointer + 1))}; pointer < ${#TOKENS[@]}; pointer++, pointer++ )); do
+	for (( pointer = ${1:-0}, pointer1 = ${2:-$((pointer + 1))}; pointer < ${#TOKENS[@]}; pointer++, pointer1++ )); do
 		case ${TOKENS[$pointer]} in
 			movLoc)
 				stack+=( "${TOKENS[$pointer1]}" ) #### Append to Stack
@@ -129,63 +129,68 @@ function usage () {
 }
 
 # Options
-unset option
-option=$(getopt -o 'hd:sf:' -a -l 'help,debug:,stdin,file:,all-files:' -q -n "$0" -- "$@")
-eval set -- "$option"
-while true; do
-	case ${1} in
-		'-h'|'--help')
-			usage
-			shift
-			break
-			;;
+function options () {
+	option=$(getopt -o 'hd:sf:' -a -l 'help,debug:,stdin,file:,all-files:' -q -n "${0}" -- "${@}")
+	eval set -- "${option}"
+	unset option
+	while true; do
+		case ${1} in
+			'-h'|'--help')
+				usage
+				shift
+				break
+				;;
 
-		'-s'|'--stdin')
-			stdin
-			shift
-			;;
+			'-s'|'--stdin')
+				stdin
+				shift
+				;;
 
-		'-f'|'--file')
-			if [[ -f ${2} ]]; then
-				src "${2}"
-			else
-				error_exit "File '${2}' does not exist"
-				break 1
-			fi
-			shift 2
-			;;
-
-		'-d'|'--debug')
-			case "${2}" in
-				1|2|3)
-					DEBUG="${2}"
-					shift 2
-					continue
-					;;
-
-				'')
-					DEBUG=1
-					shift 2
-					continue
-					;;
-
-				*)
-					error_exit "Debug option requires an argument is required, or unknown error value"
+			'-f'|'--file')
+				if [[ -f ${2} ]]; then
+					src "${2}"
+				else
+					error_exit "File '${2}' does not exist"
 					break 1
-					;;
-			esac
-			;;
+				fi
+				shift 2
+				;;
 
-		'--')
-			shift
-			break
-			;;
+			'-d'|'--debug')
+				case "${2}" in
+					1|2|3)
+						DEBUG="${2}"
+						shift 2
+						continue
+						;;
 
-		*)
-			error_exit "Unknown error"
-			;;
-	esac
-	debug
-	interpreter 0 1
-	unset DEBUG TOKENS
-done
+					'')
+						DEBUG=1
+						shift 2
+						continue
+						;;
+
+					*)
+						error_exit "Debug option requires an argument is required, or unknown error value"
+						break 1
+						;;
+				esac
+				;;
+
+			'--')
+				shift
+				break
+				;;
+
+			*)
+				error_exit "Unknown error"
+				;;
+		esac
+		debug
+		interpreter 0 1
+		unset DEBUG TOKENS
+	done
+}
+
+# Run options
+options "${@}"
