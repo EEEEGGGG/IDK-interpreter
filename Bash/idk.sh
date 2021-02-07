@@ -2,7 +2,7 @@
 
 # Error
 function error_exit () {
-	printf '\aerror: %s' "$@" >&2 ## Print error with "bell" to argument in stderr
+	printf '\aerror: %s' "${@}" >&2 ## Print error with "bell" to arguments in stderr
 	exit 1
 }
 
@@ -15,20 +15,20 @@ function stdin () {
 # File
 function src () {
 	## mapfile = readarray
-	mapfile -t TOKENS < "$1" ## Get file
+	mapfile -t TOKENS < "${1}" ## Get file
 }
 
 # Check DEBUG
 function debug () {
 	## Check if DEBUG is either 1 or 3
-	if [[ $DEBUG =~ [13] ]]; then
+	if [[ ${DEBUG} =~ [13] ]]; then
 		echo "Tokens: ${TOKENS[*]}"
 		echo "BOF: ${TOKENS[0]}"
-		echo "EOF: ${TOKENS[-1]}"
+		echo "EOF: ${TOKENS[-1]}" ### echo last element
 		[[ -n ${memstack[*]} ]] && echo "Memory Stack: ${memstack[*]}" ### Check if Memory Stack exists
 	fi
 	## Check if DEBUG is either 2 or 3
-	if [[ $DEBUG =~ [23] ]]; then
+	if [[ ${DEBUG} =~ [23] ]]; then
 		set -xv ### set verbose and xtrace
 	fi
 }
@@ -37,22 +37,29 @@ function debug () {
 function interpreter () {
 	[[ ${TOKENS[0]} == openC ]] || error_exit "No openC at BOF" ## Check if BOF exists
 
-	for (( line_pointer = ${1:-0}, line_pointer1 = ${2:-$((line_pointer + 1))}; line_pointer < ${#TOKENS[@]}; line_pointer++, line_pointer1++ )); do
-		case ${TOKENS[$line_pointer]} in
+	for (( pointer = ${1:-0}, pointer1 = ${2:-$((pointer + 1))}; pointer < ${#TOKENS[@]}; pointer++, pointer++ )); do
+		case ${TOKENS[$pointer]} in
 			movLoc)
-				stack+=( "${TOKENS[$line_pointer]}" ) #### Append to Stack
+				stack+=( "${TOKENS[$pointer1]}" ) #### Append to Stack
+				register_modified="stack"
 				;;
 
 			extract)
-				instruction="${stack[-1]}" #### Add last element
+				case "${register_modified}" in
+					stack)
+						instruction="${stack[-1]}" #### Add last element
+						;;
+					isolate)
+						instruction="${isolate}"
+				esac
 				;;
 
 			movVar)
-				variable=${TOKENS[$line_pointer1]}
+				variable=${TOKENS[$pointer1]}
 				;;
 
 			execute)
-				case $instruction in
+				case ${instruction} in
 					1)
 						exit 0
 						;;
@@ -60,25 +67,26 @@ function interpreter () {
 						printf '%s\n' "${variable[@]}"
 						;;
 					3)
-						readarray -t variable
+						read -r variable
 						;;
 				esac
 				;;
 
 			isolate)
-				line=${stack[-1]}
+				isolate=${stack[-1]}
+				register_modified="isolate"
 				;;
 
 			isolateX)
-				export memstack+=( "${TOKENS[${stack[-1]}]}" ) #### Append to Memory Stack
+				export memstack+=( "${isolate}" ) #### Append to Memory Stack
 				;;
 
 			openJump)
-				interpreter "$line" "$((line + 1))" #### Recurse through the interpreter
+				interpreter "${isolate}" "$((isolate + 1))" #### Recurse through the interpreter
 				;;
 
 			if)
-				[[ $variable == "$instruction" ]] && interpreter "$line" "$((line + 1))" #### If variable is equal to instruction, recurse through interpreter
+				[[ ${variable} == "${instruction}" ]] && interpreter "${isolate}" "$((isolate + 1))" #### If variable is equal to instruction, recurse through interpreter
 				;;
 
 			pause)
@@ -94,13 +102,13 @@ function interpreter () {
 # Show usage
 function usage () {
 	echo "Collapsed:"
-	echo "$0 [-d|--debug][=| ][1|2|3] [-hs|--help,--stdin] [-f|--file][=| ][file.idk]"
+	echo "${0} [-d|--debug][=| ][1|2|3] [-hs|--help,--stdin] [-f|--file][=| ][file.idk]"
 	echo "More Readable:"
-	echo "$0 [-h|--help]"
-	echo "$0 [-s|--stdin]"
-	echo "$0 [-f|--file][=| ]file.idk"
-	echo "$0 [--all-files][=| ]file.idk file1.idk file2.idk"
-	echo "$0 [-d|--debug][=| ][1|2|3]"
+	echo "${0} [-h|--help]"
+	echo "${0} [-s|--stdin]"
+	echo "${0} [-f|--file][=| ]file.idk"
+	echo "${0} [--all-files][=| ]file.idk file1.idk file2.idk"
+	echo "${0} [-d|--debug][=| ][1|2|3]"
 	echo
 	echo "Options:"
 	echo
@@ -122,11 +130,11 @@ function usage () {
 
 # Options
 function options () {
-	option=$(getopt -o 'hd:sf:' -a -l 'help,debug:,stdin,file:,all-files:' -q -n "$0" -- "$@")
-	eval set -- "$option"
-	unset option
-	while true; do
-		case $1 in
+unset option
+option=$(getopt -o 'hd:sf:' -a -l 'help,debug:,stdin,file:,all-files:' -q -n "$0" -- "$@")
+eval set -- "$option"
+while true; do
+		case ${1} in
 			'-h'|'--help')
 				usage
 				shift
@@ -139,19 +147,19 @@ function options () {
 				;;
 
 			'-f'|'--file')
-				if [[ -f $2 ]]; then
-					src "$2"
+				if [[ -f ${2} ]]; then
+					src "${2}"
 				else
-					error_exit "File '$2' does not exist"
+					error_exit "File '${2}' does not exist"
 					break 1
 				fi
 				shift 2
 				;;
 
 			'-d'|'--debug')
-				case "$2" in
+				case "${2}" in
 					1|2|3)
-						DEBUG="$2"
+						DEBUG="${2}"
 						shift 2
 						continue
 						;;
@@ -183,6 +191,3 @@ function options () {
 		unset DEBUG TOKENS
 	done
 }
-
-# Run
-options
