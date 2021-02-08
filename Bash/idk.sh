@@ -20,75 +20,81 @@ function src () {
 
 # Check DEBUG
 function debug () {
-	## Check if DEBUG is either 1 or 3
-	if [[ ${DEBUG} =~ [13] ]]; then
-		echo "Tokens: ${TOKENS[*]}"
-		echo "BOF: ${TOKENS[0]}"
-		echo "EOF: ${TOKENS[-1]}" ### echo last element
-		echo "Stack: ${stack[*]:-none}"
-	fi
-	## Check if DEBUG is either 2 or 3
-	if [[ ${DEBUG} =~ [23] ]]; then
-		set -xv ### set verbose and xtrace
-	fi
+	case ${1} in
+		'on')
+			## Check if DEBUG is either 2 or 3
+			if [[ ${DEBUG} =~ [23] ]]; then
+				set -xv ### set verbose and xtrace
+			fi
+			;;
+		'off')
+			## Check if DEBUG is either 1 or 3
+			if [[ ${DEBUG} =~ [13] ]]; then
+				echo "Tokens: ${TOKENS[*]}"
+				echo "BOF: ${TOKENS[0]}"
+				echo "EOF: ${TOKENS[-1]}" ### echo last element
+				echo "Stack: ${stack[*]:-none}"
+			fi
+			;;
+	esac
 }
 
 # Interpreter
 function interpreter () {
 	[[ ${TOKENS[0]} == openC ]] || error_exit "No openC at BOF" ## Check if BOF exists
 
-	for (( pointer = ${1:-0}, pointer1 = ${2:-$((pointer + 1))}; pointer < ${#TOKENS[@]}; pointer++, pointer1++ )); do
+	for (( pointer = "${1:-0}", pointer1 = "${2:-$((pointer + 1))}"; pointer < "${#TOKENS[@]}"; pointer++, pointer1++ )); do
 		case ${TOKENS[$pointer]} in
-			movLoc)
+			'movLoc')
 				stack+=( "${TOKENS[$pointer1]}" ) #### Append to Stack
 				;;
 
-			extract)
+			'extract')
 				extract="${stack[-1]}" #### Add last element
 				;;
 
-			extractX)
+			'extractX')
 				stack+=( "${extract}" ) #### Append to stack
 				;;
-			movVar)
-				variable=${TOKENS[$pointer1]}
+			'movVar')
+				variable="${TOKENS[$pointer1]}"
 				;;
 
-			varX)
+			'varX')
 				stack=( "${variable}" "${stack[@]}" ) #### Prepend to stack
 				;;
-			execute)
+			'execute')
 				case ${extract} in
-					1)
+					'1')
 						pointer=${#TOKENS[@]}
 						pointer1=$((${#TOKENS[@]} + 1))
 						;;
-					2)
+					'2')
 						printf '%s\n' "${variable[@]}"
 						;;
-					3)
+					'3')
 						read -r variable
 						;;
 				esac
 				;;
 
-			isolate)
+			'isolate')
 				isolate=${stack[-1]}
 				;;
 
-			isolateX)
+			'isolateX')
 				stack+=( "${isolate}" ) #### Append to Stack
 				;;
 
-			openJump)
+			'openJump')
 				interpreter "${isolate}" "$((isolate + 1))" #### Recurse through the interpreter
 				;;
 
-			if)
+			'if')
 				[[ ${variable} == "${extract}" ]] && interpreter "${isolate}" "$((isolate + 1))" #### If variable is equal to instruction, recurse through interpreter
 				;;
 
-			pause)
+			'pause')
 				sleep 1
 				;;
 
@@ -185,8 +191,10 @@ function options () {
 				error_exit "Unknown error"
 				;;
 		esac
+		debug 'on'
 		interpreter 0 1
-		debug
+		set +xv
+		debug 'off'
 		unset DEBUG TOKENS
 	done
 }

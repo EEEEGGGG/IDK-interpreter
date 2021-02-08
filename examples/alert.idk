@@ -5,8 +5,6 @@ extract
 movVar
 
 execute
-movLoc
-2
 isolate
 openJump
 closeC
