@@ -25,7 +25,7 @@ function debug () {
 		echo "Tokens: ${TOKENS[*]}"
 		echo "BOF: ${TOKENS[0]}"
 		echo "EOF: ${TOKENS[-1]}" ### echo last element
-		[[ -n ${memstack[*]} ]] && echo "Memory Stack: ${memstack[*]}" ### Check if Memory Stack exists
+		[[ -n ${stack[*]} ]] && echo "Stack: ${stack[*]}" ### Check if Stack exists
 	fi
 	## Check if DEBUG is either 2 or 3
 	if [[ ${DEBUG} =~ [23] ]]; then
@@ -41,25 +41,24 @@ function interpreter () {
 		case ${TOKENS[$pointer]} in
 			movLoc)
 				stack+=( "${TOKENS[$pointer1]}" ) #### Append to Stack
-				register_modified="stack"
 				;;
 
 			extract)
-				case "${register_modified}" in
-					stack)
-						instruction="${stack[-1]}" #### Add last element
-						;;
-					isolate)
-						instruction="${isolate}"
-				esac
+				extract="${stack[-1]}" #### Add last element
 				;;
 
+			extractX)
+				stack+=( "${extract}" ) #### Append to stack
+				;;
 			movVar)
 				variable=${TOKENS[$pointer1]}
 				;;
 
+			varX)
+				stack=( "${variable}" "${stack[@]}" ) #### Prepend to stack
+				;;
 			execute)
-				case ${instruction} in
+				case ${extract} in
 					1)
 						exit 0
 						;;
@@ -74,11 +73,10 @@ function interpreter () {
 
 			isolate)
 				isolate=${stack[-1]}
-				register_modified="isolate"
 				;;
 
 			isolateX)
-				export memstack+=( "${isolate}" ) #### Append to Memory Stack
+				stack+=( "${isolate}" ) #### Append to Stack
 				;;
 
 			openJump)
@@ -86,7 +84,7 @@ function interpreter () {
 				;;
 
 			if)
-				[[ ${variable} == "${instruction}" ]] && interpreter "${isolate}" "$((isolate + 1))" #### If variable is equal to instruction, recurse through interpreter
+				[[ ${variable} == "${extract}" ]] && interpreter "${isolate}" "$((isolate + 1))" #### If variable is equal to instruction, recurse through interpreter
 				;;
 
 			pause)
