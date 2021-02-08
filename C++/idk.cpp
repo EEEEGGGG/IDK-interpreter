@@ -3,19 +3,23 @@
 #include <cstdlib>
 using namespace std;
 
+int stdinMode() {
+	cout << "stdin";
+	return 0;
+}
+
 int debugMode() {
 	cout << "debug";
 	return 0;
 }
 
 int main(int argc, char *argv[]) {
-	// debug
-	bool dbg;
 	for ( int i = 1; i < argc; ++i ) {
 		string argument = argv[i];
-		if ( argument == "-d" && dbg != true ) {
-			dbg = true;
+		if ( argument == "-d" ) {
 			debugMode();
+		} else if ( argument == "-s" ) {
+			stdinMode();
 		}
 	}
 	return 0;
