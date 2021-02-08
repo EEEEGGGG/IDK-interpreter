@@ -25,7 +25,7 @@ function debug () {
 		echo "Tokens: ${TOKENS[*]}"
 		echo "BOF: ${TOKENS[0]}"
 		echo "EOF: ${TOKENS[-1]}" ### echo last element
-		[[ -n ${stack[*]} ]] && echo "Stack: ${stack[*]}" ### Check if Stack exists
+		echo "Stack: ${stack[*]:-none}"
 	fi
 	## Check if DEBUG is either 2 or 3
 	if [[ ${DEBUG} =~ [23] ]]; then
@@ -60,7 +60,8 @@ function interpreter () {
 			execute)
 				case ${extract} in
 					1)
-						exit 0
+						pointer=${#TOKENS[@]}
+						pointer1=$((${#TOKENS[@]} + 1))
 						;;
 					2)
 						printf '%s\n' "${variable[@]}"
@@ -184,8 +185,8 @@ function options () {
 				error_exit "Unknown error"
 				;;
 		esac
-		debug
 		interpreter 0 1
+		debug
 		unset DEBUG TOKENS
 	done
 }
