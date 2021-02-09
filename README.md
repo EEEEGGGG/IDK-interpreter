@@ -54,11 +54,33 @@
 			<pre>
 			Debug on a file or stdin.
 			Running this option without any level will set the defualt to 1.
-			</pre
+			</pre>
+			<table>
+			<thead>
+				<tr>
+					<th>Debug Level</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>Enables debugging, outputs tokens, BOF, EOF, stack.</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>
+						sets <code>set -xv</code> in bash
+					</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td>Both 1 and 2</td>
+				</tr>
+			</tbody>
+			</table>
 		</td>
 	</tr>
 
 </tbody>
 </table>
-|     `-d`     |  `--debug`  |   Debug file or stdin  | Debug on a file or stdin.<br>Running this option without any level will set the defualt to 1.<br><table><thead><tr><th>Debug Level</th><th>Description</th></tr></thead><tbody><tr><td>1</td><td>Enables debugging, outputs tokens, BOF, EOF, stack.</td></tr><tr><td>2</td><td>sets <code>set -xv</code> in bash</td></tr><tr><td>3</td><td>Both 1 and 2</td></tr></tbody></table>|
-
