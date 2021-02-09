@@ -17,7 +17,7 @@
 		<td>
 			<code>--help</code>
 		</td>
-		<td>Show help page/td>
+		<td>Show help page</td>
 		<td>Running help page first before other options will cancel it.</td>
 	</tr>
 	<tr>
@@ -37,9 +37,7 @@
 		<td>
 			<code>--files</code>
 		</td>
-		<td>
-			<code>Run program from file</code>
-		</td>
+		<td>Run program from file</td>
 		<td>You can set this option multiple times</td>
 	</tr>
 	<tr>
