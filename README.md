@@ -1,11 +1,5 @@
 # IDK-interpreter
 ## Usage
-| Short Option | Long Option |       Description      |                                                     Notes                                                    |
-|:------------:|:-----------:|:----------------------:|:------------------------------------------------------------------------------------------------------------:|
-|     `-h`     |   `--help`  |        |                                                |
-|     `-s`     |  `--stdin`  | Run program from stdin |                                    You can set this option multiple times                                    |
-|     `-f`     |   `--file`  |  Run program from file |                                    You can set this option multiple times                                    |
-|     `-d`     |  `--debug`  |   Debug file or stdin  | Debug on a file or stdin.<br>Running this option without any level will set the defualt to 1.<br><table><thead><tr><th>Debug Level</th><th>Description</th></tr></thead><tbody><tr><td>1</td><td>Enables debugging, outputs tokens, BOF, EOF, stack.</td></tr><tr><td>2</td><td>sets <code>set -xv</code> in bash</td></tr><tr><td>3</td><td>Both 1 and 2</td></tr></tbody></table>|
 <table>
 <thead>
 	<tr>
@@ -21,54 +15,65 @@
 			<code>-h</code>
 		</td>
 		<td>
-			code>--help</code>
+			<code>--help</code>
 		</td>
-		<td>Show help page/td>
+		<td>Show help page</td>
 		<td>Running help page first before other options will cancel it.</td>
 	</tr>
 	<tr>
 		<td>
-			<code>-h</code>
+			<code>-s</code>
 		</td>
 		<td>
-			<code>-h</code>
+			<code>--stdin</code>
 		</td>
-		<td>
-			<code>-h</code>
-		</td>
-		<td>
-			<code>-h</code>
-		</td>
+		<td>Run program from stdin</td>
+		<td>You can set this option multiple times</td>
 	</tr>
 	<tr>
 		<td>
-			<code>-h</code>
+			<code>-f</code>
 		</td>
 		<td>
-			<code>-h</code>
+			<code>--files</code>
 		</td>
-		<td>
-			<code>-h</code>
-		</td>
-		<td>
-			<code>-h</code>
-		</td>
+		<td>Run program from file</td>
+		<td>You can set this option multiple times</td>
 	</tr>
 	<tr>
 		<td>
-			<code>-h</code>
+			<code>-d</code>
 		</td>
 		<td>
-			<code>-h</code>
+			<code>--debug</code>
 		</td>
+		<td>Debug file or stdin</td>
 		<td>
-			<code>-h</code>
-		</td>
-		<td>
-			<code>-h</code>
-		</td>
-	</tr>
-
-</tbody>
-</table>
-
+			Debug on a file or stdin.
+			<br>
+			Running this option without any level will set the defualt to 1.
+			<br>
+			<table>
+			<thead>
+				<tr>
+					<th>Debug Level</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>Enables debugging, outputs tokens, BOF, EOF, stack.</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>
+						sets <code>set -xv</code> in bash
+					</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td>Both 1 and 2</td>
+				</tr>
+			</tbody>
+			</table>
