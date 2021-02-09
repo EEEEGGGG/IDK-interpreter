@@ -15,7 +15,7 @@
 			<code>-h</code>
 		</td>
 		<td>
-			code>--help</code>
+			<code>--help</code>
 		</td>
 		<td>Show help page/td>
 		<td>Running help page first before other options will cancel it.</td>
