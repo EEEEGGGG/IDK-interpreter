@@ -1,8 +1,0 @@
-# Vim
-*~
-*.swp
-*.swo
-# Visual Studio Code
-.vscode
-# clang compiler (or maybe gcc and others)
-a.out
