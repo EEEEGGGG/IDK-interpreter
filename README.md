@@ -51,10 +51,10 @@
 		</td>
 		<td>Debug file or stdin</td>
 		<td>
-			<pre>
 			Debug on a file or stdin.
+			<br>
 			Running this option without any level will set the defualt to 1.
-			</pre>
+			<br>
 			<table>
 			<thead>
 				<tr>
