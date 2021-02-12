@@ -46,7 +46,7 @@ extract
 if
 movLoc
 0
-extract
-execute
+isolate
+openJump
 
 closeC
