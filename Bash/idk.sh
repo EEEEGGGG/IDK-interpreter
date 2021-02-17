@@ -16,6 +16,9 @@ function stdin () {
 function src () {
 	## mapfile = readarray
 	mapfile -t TOKENS < "${1}" ## Get file
+	if [[ ${TOKENS[0]} =~ ^#! ]]; then ## check shebang line
+		TOKENS=("${TOKENS[@]:1}") ### Shift TOKENS
+	fi
 }
 
 # Check DEBUG
