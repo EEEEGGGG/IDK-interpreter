@@ -1,0 +1,17 @@
+name: Bash
+on:
+  push:
+    paths:
+      - Bash/**
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup BATS
+        uses: mig4/setup-bats@v1
+        with:
+          bats-version: 1.2.1
+      - name: Run bats
+        run: bats -r Bash/
