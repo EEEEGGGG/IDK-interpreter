@@ -3,20 +3,23 @@ name: Rust
 on:
   push:
     paths:
-    - Rust/**
-    - !Rust/**/*.md
+    - 'Rust/**'
+    - '!Rust/**/*.md'
   workflow_dispatch:
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build:
-
+    env:
+      cwd: ./Rust
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
     - name: Build
       run: cargo build --verbose
+      working-directory: ${{env.cwd}}
     - name: Run tests
       run: cargo test --verbose
+      working-directory: ${{env.cwd}}

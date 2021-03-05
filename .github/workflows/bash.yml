@@ -2,9 +2,9 @@ name: Bash
 on:
   push:
     paths:
-      - Bash/**
-      - !Bash/**/*.md
-      - !Bash/**/*.bats
+      - 'Bash/**'
+      - '!Bash/**/*.md'
+      - '!Bash/**/*.bats'
   workflow_dispatch:
 jobs:
   build:
